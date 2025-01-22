@@ -48,15 +48,15 @@ export class PrismaCheckInsRepository implements CheckInsRepository {
   }
 
   async findByUserIdOnDate(userId: string, date: Date) {
-    const startOfDay = dayjs(date).startOf('date').toDate()
-    const endOfDay = dayjs(date).endOf('date').toDate()
+    const startOfDay = dayjs(date).startOf('date').toISOString()
+    const endOfDay = dayjs(date).endOf('date').toISOString()
 
     const checkIn = await prisma.checkIn.findFirst({
       where: {
         user_id: userId,
         created_at: {
-          gte: startOfDay.toDateString(),
-          lt: endOfDay.toDateString(),
+          gte: startOfDay,
+          lt: endOfDay,
         },
       },
     })
