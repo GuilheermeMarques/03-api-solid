@@ -1,31 +1,25 @@
-import { FastifyRequest, FastifyReply } from 'fastify'
-import { z } from 'zod'
-import { makeCreateGymUseCase } from '@/use-cases/factories/make-create-gym-use-case'
+import request from 'supertest'
+import { app } from '@/app'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-export async function create(request: FastifyRequest, reply: FastifyReply) {
-  const createGymBodySchema = z.object({
-    title: z.string(),
-    descriptions: z.string().email(),
-    phone: z.string(),
-    latitude: z.number().refine((value) => {
-      return Math.abs(value) <= 90
-    }),
-    longitude: z.number().refine((value) => {
-      return Math.abs(value) <= 180
-    }),
+describe('Create Gym (e2e)', () => {
+  beforeAll(async () => {
+    await app.ready()
   })
 
-  const { title, descriptions, phone, latitude, longitude } =
-    createGymBodySchema.parse(request.body)
-
-  const createGymUseCase = makeCreateGymUseCase()
-  await createGymUseCase.execute({
-    title,
-    descriptions,
-    phone,
-    latitude,
-    longitude,
+  afterAll(async () => {
+    await app.close()
   })
 
-  return reply.status(201).send()
-}
+  it('Should be able to create gym', async () => {
+    const response = await request(app.server).post('/gyms').send({
+      titlle: 'John Doe',
+      descriptions: 'johndoe@example.com',
+      phone: '123456',
+      latitude: 0,
+      longitude: 0,
+    })
+
+    expect(response.statusCode).toEqual(201)
+  })
+})
