@@ -24,7 +24,6 @@ export default <Environment>{
   transformMode: 'ssr',
   async setup() {
     const schema = randomUUID()
-
     const databaseURL = generateDataBaseURL(schema)
 
     process.env.DATABASE_URL = databaseURL
